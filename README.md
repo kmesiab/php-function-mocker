@@ -91,6 +91,5 @@ class, returning it for you to test as your heart desires.
 
 ### Complaints
 
-- Please email complaints to [Tim Bond](mailto:tim.bond@mheducation.com)
-- Please email accolades to[ Kevin Mesiab](mailto:kevin.mesiab@mheducation.com)
+- Please email accolades to[ Kevin Mesiab](mailto:kmesiab@gmail.com)
 - If you find a bug, don't complain, submit a PR. 
