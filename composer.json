@@ -14,5 +14,8 @@
             "name": "Kevin Mesiab",
             "email": "kmesiab@gmail.com"
         }
-    ]
+    ],
+    "scripts": {
+        "test": "vendor/bin/phpunit"
+    }
 }
