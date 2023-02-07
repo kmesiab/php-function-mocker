@@ -1,8 +1,8 @@
 <?php
 
-namespace MockableClass;
+namespace Fixtures;
 
-class Foo {
+class MockableClass {
 
     public function doStuff()
     {

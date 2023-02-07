@@ -1,28 +1,35 @@
 <?php
 
-namespace FunctionMock;
+namespace Mockable;
 
+use Exception;
 use ReflectionClass;
+use ReflectionException;
 
 class MockGenerator
 {
     private string $classFQN;
     private string $classNamespace;
-    private string $originalClassName;
     private string $newMockedClassName;
     private string $newMockedFunctionName;
-    private string $newMockedClassFileName = '';
+    private string $newMockedClassFileName;
 
+    /**
+     * @throws Exception
+     */
     public function __construct(string $classFQN)
     {
         $this->classFQN = $classFQN;
         $classNameParts = explode('\\', $this->classFQN);
-        $this->originalClassName = array_pop($classNameParts);
+        $originalClassName = array_pop($classNameParts);
         $this->classNamespace = implode('/', $classNameParts);
-        $this->newMockedClassName = $this->renameClassToMockedClassName($this->originalClassName);
-        $this->newMockedClassFileName = $this->newMockedClassName . "_function_mocked_" . rand(1, 1000) . '.php';
+        $this->newMockedClassName = $this->renameClassToMockedClassName($originalClassName);
+        $this->newMockedClassFileName = $this->newMockedClassName . "_function_mocked_" . random_int(1, 1000) . '.php';
     }
 
+    /**
+     * @throws ReflectionException
+     */
     public function mockFunctionReturnValue(string $functionName, string $returnValue): object
     {
         $sourceCode = $this->getSourceCode($this->getClassToMock());
@@ -37,6 +44,10 @@ class MockGenerator
 
     }
 
+    /**
+     * @throws ReflectionException
+     * @throws Exception
+     */
     public function mockFunction(string $functionName, callable $replacementFunction): object
     {
         $this->newMockedFunctionName = $this->renameMockedFunction($functionName);
@@ -48,20 +59,21 @@ class MockGenerator
         $fullMockedClassName = $this->classNamespace . '\\' . $this->newMockedClassName;
 
         $newMockedClass = new $fullMockedClassName;
-        $this->attachCallableToMockedClass($newMockedClass, $functionName, $replacementFunction);
+        $this->attachCallableToMockedClass($newMockedClass, $replacementFunction);
         return $newMockedClass;
     }
 
-    private function renameClassToMockedClassName(string $className)
+    private function renameClassToMockedClassName(string $className): string
     {
-        $mockedClassName = 'function_mocked_class_' . strtolower($className);
-
-        return $mockedClassName;
+        return 'function_mocked_class_' . strtolower($className);
     }
 
+    /**
+     * @throws ReflectionException
+     */
     private function getClassToMock(): ReflectionClass
     {
-        return new \ReflectionClass($this->classFQN);
+        return new ReflectionClass($this->classFQN);
     }
 
     private function getSourceCode(ReflectionClass $classToMock): string
@@ -75,54 +87,66 @@ class MockGenerator
         $template = "class $this->newMockedClassName {\n";
         $classRegex = '/class(.*)\s/';
 
-        $rewrittenSourceCode = preg_replace($classRegex, $template, $sourceCodeString);
-
-        return $rewrittenSourceCode;
+        return preg_replace($classRegex, $template, $sourceCodeString);
     }
 
-    private function replaceFunctionContents(string $sourceCodeString, string $functionName, string $replacement): string
+    private function replaceFunctionContents(
+        string $sourceCodeString,
+        string $functionName,
+        string $replacement): string
     {
-        $replacement = preg_replace("/'/", "\'", $replacement);
+        $replacement = str_replace("/'/", "\'", $replacement);
         $template = "function $functionName() { return '$replacement'; }";
 
         $functionRegex = "/function\s($functionName)\([\s\w$,]*\)\n\s*\{(\n[\d\w\s$->]*)}/";
-        $rewrittenSourceCode = preg_replace($functionRegex, $template, $sourceCodeString);
-        return $rewrittenSourceCode;
+        return preg_replace($functionRegex, $template, $sourceCodeString);
     }
 
-    private function renameMockedFunction(string $functionName)
+    /**
+     * @throws Exception
+     */
+    private function renameMockedFunction(string $functionName): string
     {
-        return "mocked_function_" . rand(1, 1000) . "_$functionName";
+        return "mocked_function_" . random_int(1, 1000) . "_$functionName";
     }
 
-    private function removeFunctionFromSourceCode(string $sourceCodeString, string $functionName)
+    private function removeFunctionFromSourceCode(string $sourceCodeString, string $functionName): array|string|null
     {
         $newFunctionSignature = "public function $functionName() ";
-        $invokeNewFunction =  $newFunctionSignature . '{ call_user_func($this->' .
+        $invokeNewFunction =  $newFunctionSignature . '{ return call_user_func($this->' .
             $this->newMockedFunctionName .
             ');}';
 
         $functionRemovalRegex = "/\w*\sfunction\s$functionName\(\).*[\n\s]*\{.*[.\n\s\w';]*\}/";
-        $rewrittenSourceCode = preg_replace($functionRemovalRegex, $invokeNewFunction, $sourceCodeString);
-        return $rewrittenSourceCode;
+        return preg_replace($functionRemovalRegex, $invokeNewFunction, $sourceCodeString);
     }
 
-    private function attachCallableToMockedClass(object &$mockedClass, string $functionName, callable $replacementFunction)
+    private function attachCallableToMockedClass(
+        object   $mockedClass,
+        callable $replacementFunction): void
     {
         $mockedClass->{$this->newMockedFunctionName} = $replacementFunction;
     }
 
-    private function saveAndLoadSourceCode(string $sourceCode)
+    private function saveAndLoadSourceCode(string $sourceCode): void
     {
         file_put_contents($this->newMockedClassFileName, $sourceCode);
         require_once $this->newMockedClassFileName;
     }
 
-    public function destroy()
+    public function destroy(): void
     {
         if (!empty($this->newMockedClassFileName)) {
             unlink($this->newMockedClassFileName);
         }
+    }
+
+    public function showMutatedFunctions($mockedClass): array
+    {
+        return array_diff(
+            array_keys(get_object_vars($mockedClass)),
+            array_keys(get_class_vars(get_class($mockedClass)))
+        );
     }
 }
 
