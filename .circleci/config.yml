@@ -10,9 +10,10 @@ jobs:
     steps:
       - checkout
       - composer/install
-  test:
+  unit-tests:
     docker:
       - image: cimg/php:8.2.7
 
     steps:
+      - checkout
       - run: composer test
