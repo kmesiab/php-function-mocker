@@ -1,5 +1,7 @@
 # Mockable: Mocking Functions
 
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/kmesiab/php-function-mocker/tree/main.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/kmesiab/php-function-mocker/tree/main)
+
 ***This little library is the start of a ridiculous notion, how can we mock a
 function of a class under test (COT).***
 

@@ -21,5 +21,10 @@
         "bmitch/codor": "^1.2",
         "phpmd/phpmd": "^2.13",
         "phpunit/phpunit": "^10.2"
+    },
+    "config": {
+        "platform": {
+            "php": "8.2.7"
+        }
     }
 }
