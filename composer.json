@@ -1,7 +1,8 @@
 {
     "name": "kmesiab/php-function-mocker",
-    "description": "Mockable is a library that lets you mutate the behavior of a dependent function within a \"Class Under Test\" enhancing coverage in your PHP Unit tests.",
+    "description": "Mockable is a library that lets you mutate the behavior of a dependent function within a 'Class Under Test' enhancing coverage in your PHP Unit tests.",
     "type": "library",
+    "license": "proprietary",
     "autoload": {
         "psr-4": {
             "Kmesiab\\PhpFunctionMocker\\": "src/"
