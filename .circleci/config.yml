@@ -7,7 +7,12 @@ jobs:
     docker:
       - image: cimg/php:8.2.7
 
-
     steps:
       - checkout
       - composer/install
+  test:
+    docker:
+      - image: cimg/php:8.2.7
+
+    steps:
+      - run: composer test
