@@ -1,9 +1,7 @@
 {
     "name": "kmesiab/php-function-mocker",
+    "description": "Mockable is a library that lets you mutate the behavior of a dependent function within a \"Class Under Test\" enhancing coverage in your PHP Unit tests.",
     "type": "library",
-    "require": {
-        "phpunit/phpunit": "^10.0"
-    },
     "autoload": {
         "psr-4": {
             "Kmesiab\\PhpFunctionMocker\\": "src/"
@@ -11,11 +9,16 @@
     },
     "authors": [
         {
-            "name": "Kevin Mesiab",
-            "email": "kmesiab@gmail.com"
+            "name": "Kevin Mesiab"
         }
     ],
     "scripts": {
-        "test": "vendor/bin/phpunit"
+        "test": "./vendor/phpunit/phpunit/phpunit ./tests --colors",
+        "phpmd": "./vendor/phpmd/phpmd/src/bin/phpmd src text cleancode,controversial,design,naming,unusedcode"
+    },
+    "require-dev": {
+        "bmitch/codor": "^1.2",
+        "phpmd/phpmd": "^2.13",
+        "phpunit/phpunit": "^10.2"
     }
 }
